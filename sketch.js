@@ -1,3 +1,5 @@
+
+
 function setup() {
   
   cs = 400;
@@ -5,7 +7,19 @@ function setup() {
   colorMode(HSL);
   background(0,0,0);
 
-  output = createWriter("genetics.txt"); 
+  table = loadTable("genetics.txt", "header");
+
+  for (i = 0; i < table.getRowCount(); i++) ; 
+  {
+    print(i);
+    row = table.getRow(i);
+    CircleID = row.getString("CircleID");
+    H = row.getString("H");
+    S = row.getString("S");
+    L = row.getString("L");
+
+    println(CircleID + " " + H + " " + S + " " + L);
+  }
 
 }
 
@@ -24,6 +38,8 @@ function draw() {
   let LargeCircleHue = h;
   let StrokeHue = (h + 150) % 360;
   let SmallCircleHue = (h + 210) % 360;
+ 
+
  
   
   //Stroke weight of Large Circle
@@ -89,3 +105,4 @@ function drawCircles(h,s,l, xloc, yloc, size, sw){
   
 
 }
+
