@@ -1,4 +1,12 @@
 
+let table;
+function preload() 
+{
+ //load the file with circle genetics
+  table = loadTable('genetics.csv','csv', 'header');
+}
+
+
 
 function setup() {
   
@@ -7,19 +15,32 @@ function setup() {
   colorMode(HSL);
   background(0,0,0);
 
-  table = loadTable("genetics.txt", "header");
+//Get the value of the intial parents
+//first time is defined as 1 and 2..Need the think abot a generational tag?
+//Each subsequent generation produces 1 less offspring
 
-  for (i = 0; i < table.getRowCount(); i++) ; 
+
+
+
+  let rc = table.getRowCount();
+  let r = random(1,rc).toPrecision(1,6);
+  //Get values from the ro
+  print("Row: " + r);
   {
-    print(i);
-    row = table.getRow(i);
-    CircleID = row.getString("CircleID");
-    H = row.getString("H");
-    S = row.getString("S");
-    L = row.getString("L");
-
-    println(CircleID + " " + H + " " + S + " " + L);
+    let row = table.getRow(r);
+    let CircleID = row.getString("CircleID");
+    let H1 = row.getString("H");
+    let S1 = row.getString("S");
+    let L1 = row.getString("L");
+   
+    print(CircleID + " " + H1 + " " + S1 + " " + L1);
   }
+
+
+
+
+
+
 
 }
 
