@@ -8,8 +8,6 @@ let sw = 0;
 let xloc = 0;
 let yloc = 0;
 
-
-
 function preload() {
   //load the file with circle genetics
   table = loadTable('genetics.csv', 'csv', 'header');
@@ -22,8 +20,8 @@ function setup() {
   cs = 400;
   createCanvas(cs, cs + 100);
   colorMode(HSL);
-  background(10, 0, 0);
-  
+  background(99, 50, 50);
+  noLoop();
 
 }
 
@@ -38,26 +36,21 @@ function draw() {
   //Small Circle Size and Position will be parameters
 
   //Get the genetic values of the intial parents.
-  //first time is defined as 1 and 2..Need the think about a generational tag?
- 
+  //This will be a giant loop. Advance the generation each time.
+  let gen = 0;
+  let parentGenetics = getParentGenetics(gen);
+  
+  let childGenetics = calculateChildGenetics(parentGenetics);
 
-   getParentGenetics(0);
-   calculateChildGenetics();
-   drawCircles();
-  // let h = random(0,360);
-  // let s = random(25,100);
-  // let l = random(25,75);
-  //let chue = (h + 90) % 360;
-  let LargeCircleHue = h;
-  let StrokeHue = (h + 150) % 360;
-  let SmallCircleHue = (h + 210) % 360;
+
+   //apply the genetics to the child.
+  h = childGenetics.H_C;
+  s = parentGenetics.H_X;
+  l = parentGenetics.H_X;
 
 
 
 
-  //Stroke weight of Large Circle
-  rsw = random(5, 50);
-  let LargeCircleSize = (cs - rsw); //Canvas size - strokeweight (400 - 50 = 350)
   ///////////////////////
   //Large circle
   strokeWeight(rsw);
@@ -104,9 +97,8 @@ function draw() {
   fill(SmallCircleHue, s, l);
   text(schtxt, (cs / 2) - (schtxt.length), cs + 75);
 
-  let filename = "Circle_" + i.toString();
-  save(filename);
-  noLoop();
+  drawCircles();
+ 
 
 
 
@@ -124,43 +116,93 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
 
 
   function getParentGenetics(generation){
-  //Find 2 random parents and get their genetics
-  //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
-  //Get the rowcount of records in that generation
+      //Find 2 random parents and get their genetics
+      //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
+      
+      let CircleID_X = 0;
+      let CircleID_Y = 0;
+      let H_X = 0;
+      let H_Y = 0;
+      let S_X = 0;
+      let S_Y = 0;
+      let L_X = 0;
+      let L_Y = 0;
+      
+    //Get the rowcount of records in that generation
+    let rows = table.matchRows(generation,"Generation");
+    let rowcount = rows.length;
+    
+    //Get the row of parent 1 (X) 
+    let p1 = round(random(0,rowcount-1));
 
- let rows = table.matchRows(generation,"Generation");
- let rowcount = rows.length;
- //Get parent 1 Genetics
- let p1 = round(random(0,rowcount-1));
-
- //Get Parent 2 Genetics. Can't be the same as p1 so need to compare the random number generated
-let p2 = p1;
-let x = 0;
-while (p1 === p2){
- p2 = round(random(0,rowcount-1));
- x = x + 1;
-//safey exit
- if (x === 10) {break;} else { }
-}//end while
-
-//We now have the row number, so we can extract the genetic values
-print("Parent 1 Row : " + p1);
-print("Parent 2 Row : " + p2);
-
-let CircleID_X = rows[p1].getString("CircleID");
-let CircleID_Y = rows[p2].getString("CircleID");
-
-let H_X = rows[p1].getString("H");
-let H_Y = rows[p2].getString("H");
-
-let S_X = rows[p1].getString("S");
-let S_Y = rows[p2].getString("S");
+    //Get the row of parent 2 (Y)... Can't be the same as Parent 1, so need to compare the random number generated
+    let p2 = p1;
+    let x = 0;
+    while (p1 === p2){
+    p2 = round(random(0,rowcount-1));
+    x = x + 1;
+    //safey exit
+    if (x === 10) {break;} else { }
+    }//end while
 
 
-print("Parent 1 CircleID: " + CircleID_X + "," + H_X);
-print("Parent 2 CircleID: " + CircleID_Y + "," + H_Y);
+    CircleID_X = rows[p1].getString("CircleID");
+    CircleID_Y = rows[p2].getString("CircleID");
+
+    H_X = rows[p1].getString("H");
+    H_Y = rows[p2].getString("H");
+
+    S_X = rows[p1].getString("S");
+    S_Y = rows[p2].getString("S");
+
+    L_X = rows[p1].getString("L");
+    L_Y = rows[p2].getString("L");
+
+    return {
+       
+      H_X : H_X,
+      H_Y : H_Y,
+      S_X : S_X,
+      S_Y : S_Y,
+      L_X : L_X,
+      L_Y : L_Y
+
+    }; 
+
+
 
 }//GetParentGenetics
   
 
+function calculateChildGenetics(parentGenetics){
+//Calculate the Child Genetics. This is the math shit...
 
+
+//Hue
+H_C = random(parentGenetics.H_X, parentGenetics.H_Y);
+
+//Stroke weight of Large Circle
+rsw = random(5, 50);
+let LargeCircleSize = (cs - rsw); //Canvas size - strokeweight (400 - 50 = 350)
+
+
+
+
+
+let chue = (h + 90) % 360;
+let LargeCircleHue = h;
+let StrokeHue = (h + 150) % 360;
+let SmallCircleHue = (h + 210) % 360;
+
+
+
+
+return{
+
+  H_C: H_C,
+
+
+}
+
+
+}
