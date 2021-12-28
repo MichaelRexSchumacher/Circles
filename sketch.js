@@ -1,9 +1,9 @@
-
 let table;
 
 function preload() {
   //load the file with circle genetics
   table = loadTable('genetics.csv', 'csv', 'header');
+
 }
 
 
@@ -13,7 +13,7 @@ function setup() {
   canvasSize = 400;
   xPos = canvasSize / 2;
   yPos = canvasSize / 2;
-  createCanvas(canvasSize, canvasSize + 100); //adding some space to the bottom of the canvas
+  createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
   noLoop();
@@ -22,7 +22,6 @@ function setup() {
 
 
 function draw() {
-
 
   //Set up the colors and comlimentary
   //https://dev.to/benjaminadk/make-color-math-great-again--45of
@@ -49,23 +48,34 @@ function draw() {
 
  
   ///////////////////////
-  //Large circle
+  //Large circlenewRow.setString('name', 'Wolf');
   largeCircleHue = h;
   strokeHue = (h + 150) % 360;
   stroke(strokeHue, s, l);
   drawCircles(largeCircleHue, s, l, xPos, yPos, largeCircleSize, sw);
-  print("Large Circle Size: " + largeCircleSize);
-  print("Large Circle Hue: " + largeCircleHue);
-  print("Large Circle Sat: " + s);
-  print("Large Circle Lum: " + l);
-  print("Stroke Hue: " + strokeHue);
+  // print("Large Circle Size: " + largeCircleSize);
+  // print("Large Circle Hue: " + largeCircleHue);
+  // print("Large Circle Sat: " + s);
+  // print("Large Circle Lum: " + l);
+  // print("Large Circle StorkeWeight: " + sw)
+  // print("Stroke Hue: " + strokeHue);
 
   //small circle
   smallCircleHue = (h + 210) % 360;
   drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
-  print("Small Circle Size: " + smallCircleSize);
-  print("Small Circle Hue: " + smallCircleHue);
+  // print("Small Circle Size: " + smallCircleSize);
+  // print("Small Circle Hue: " + smallCircleHue);
   
+//save the data
+let newID = max(table.getColumn("CircleID"))+1;
+let newRow = table.addRow();
+newRow.set("CircleID", newID);
+print("newID: " + newID);
+saveTable(table,"genetics.csv");
+
+//save the canavas
+save("circle_" + newID +".png")
+
 }
 
 function drawCircles(h, s, l, xloc, yloc, size, sw) {
@@ -74,14 +84,13 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
   strokeWeight(sw);
   circle(xloc, yloc, size); //position and size the Circle
 
-
 }
 
 
 
   function getParentGenetics(generation){
-      //Find 2 random parents and get their genetics
-      //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
+    //Find 2 random parents and get their genetics
+    //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
      
 
     //Get the rowcount of records in that generation
@@ -185,33 +194,34 @@ return{
 function getSmallCirclePosition(sz,parentGenetics){
 
 //Small circle position
+//Using Pythagores with LCR - SMR - Half the stroke weight. Stroke weight is centered on the edge.
 //Need the Large Circle Radius
-lcr = (canvasSize - swC)/2; //Canvas size - strokeweight (400 - 50 = 350)
+lcr = (canvasSize - (swC * 2))/2; //Canvas size - (Child strokeweight x 2) / 2
 scr = (sz/2);
-
-print("lcr: " + lcr);
-print("scr: " + scr);
 
 xPosC = random(parentGenetics.xPosX,parentGenetics.xPosY);
 yPosC = random(parentGenetics.yPosX,parentGenetics.yPosY);
+
+
+a2 = Math.pow((xPosC - xPos),2);
+b2 = Math.pow((yPosC - yPos),2);
+ab = (Math.pow((xPosC - xPos),2)) + (Math.pow((yPosC - yPos),2));
+r2 = Math.pow((lcr-scr-(swC/2)),2);
+
+
 
 print("xPos: " + xPos);
 print("yPos: " + yPos);
 print("xPosC: " + xPosC);
 print("xPosC: " + yPosC);
-
-a2 = (Math.pow((abs(xPosC - xPos)),2));
-b2 = (Math.pow((abs(yPosC - yPos)),2));
-ab = (Math.pow((abs(xPosC - xPos)),2)) + (Math.pow((abs(yPosC - yPos)),2));
-r2 = Math.pow((lcr-scr),2);
-
+print("lcr: " + lcr);
+print("scr: " + scr);
 print("a2: " + a2);
 print("b2: " + b2);
 print("ab: " + ab);
-print("r2: " + r2);
 
 //need to figure out if the circle position ovelaps the other circle. If so, try again.
-if (ab > r2)
+if (ab > (r2))
 {
   
   print("No Soup for you!!");
