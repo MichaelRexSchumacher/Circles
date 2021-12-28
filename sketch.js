@@ -16,6 +16,8 @@ function setup() {
   createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
+  maxGen = 1;
+  maxChildren = 4;
   noLoop();
 
 }
@@ -30,51 +32,79 @@ function draw() {
   //Small Circle Size and Position will be parameters
 
   //Get the genetic values of the intial parents.
-  //This will be a giant loop. Advance the generation each time.
-  let gen = 0;
-  let parentGenetics = getParentGenetics(gen);
-  let childGenetics = calculateChildGenetics(parentGenetics);
+  //This will need to be a giant loop. Advance the generation each time.
+    for (let gen = 0; gen < maxGen;){
+
+      let parentGenetics = getParentGenetics(gen);
+     
+      let idX = parentGenetics.idX;
+      let idY = parentGenetics.idY;
+     print("idX: " + idX);
+     print("idY: " + idY);
+      gen = gen + 1;
+      for(let child = 0; child < maxChildren; child++){
+
+      let childGenetics = calculateChildGenetics(parentGenetics);
+
+      //apply the genetics from the child.
+      h = childGenetics.hC;
+      s = childGenetics.sC;
+      l = childGenetics.lC;
+      sw = childGenetics.swC;
+      largeCircleSize =  canvasSize - (sw * 2);
+      smallCircleSize = childGenetics.sz;
+      // posX = childGenetics.posX;
+      // posY = childGenetics.posY;
+      xPosC = childGenetics.xPosC;
+      yPosC = childGenetics.yPosC;
+    
+      ///////////////////////
+      largeCircleHue = h;
+      strokeHue = (h + 150) % 360;
+      stroke(strokeHue, s, l);
+      drawCircles(largeCircleHue, s, l, xPos, yPos, largeCircleSize, sw);
+      // print("Large Circle Size: " + largeCircleSize);
+      // print("Large Circle Hue: " + largeCircleHue);
+      // print("Large Circle Sat: " + s);
+      // print("Large Circle Lum: " + l);
+      // print("Large Circle StorkeWeight: " + sw)
+      // print("Stroke Hue: " + strokeHue);
+
+      //small circle
+      smallCircleHue = (h + 210) % 360;
+      drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
+      
+      //save the data
+      let newID = max(table.getColumn("CircleID"))+1;
+      let newRow = table.addRow();
+      newRow.setString("CircleID", newID);
+      newRow.setString("Generation", gen);
+      newRow.setString("H", h);
+      newRow.setString("S", s);
+      newRow.setString("L", l);
+      newRow.setString("StrokeWeight",sw);
+      newRow.setString("Size",smallCircleSize);
+      newRow.setString("xPosition", xPosC);
+      newRow.setString("yPosition",yPosC);
+      //newRow.setString("ParentXID", idX);
+      //newRow.setString("ParentYID", idY);
+      
+      print("newID: " + newID);
+
+      //save the canavas
+      save("circle_" + newID +".png")
+      clear();
+      background(0, 0, 0); //reset the background to black
+    }//End of the children
+
+  }//end of the generation
 
 
-   //apply the genetics from the child.
-  h = childGenetics.hC;
-  s = childGenetics.sC;
-  l = childGenetics.lC;
-  sw = childGenetics.swC;
-  largeCircleSize =  canvasSize - (sw * 2);
-  smallCircleSize = childGenetics.sz;
-  posX = childGenetics.posX;
-  posY = childGenetics.posY;
 
- 
-  ///////////////////////
-  //Large circlenewRow.setString('name', 'Wolf');
-  largeCircleHue = h;
-  strokeHue = (h + 150) % 360;
-  stroke(strokeHue, s, l);
-  drawCircles(largeCircleHue, s, l, xPos, yPos, largeCircleSize, sw);
-  // print("Large Circle Size: " + largeCircleSize);
-  // print("Large Circle Hue: " + largeCircleHue);
-  // print("Large Circle Sat: " + s);
-  // print("Large Circle Lum: " + l);
-  // print("Large Circle StorkeWeight: " + sw)
-  // print("Stroke Hue: " + strokeHue);
-
-  //small circle
-  smallCircleHue = (h + 210) % 360;
-  drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
-  // print("Small Circle Size: " + smallCircleSize);
-  // print("Small Circle Hue: " + smallCircleHue);
-  
-//save the data
-let newID = max(table.getColumn("CircleID"))+1;
-let newRow = table.addRow();
-newRow.set("CircleID", newID);
-print("newID: " + newID);
+//Once all the new rows have been added..
 saveTable(table,"genetics.csv");
 
-//save the canavas
-save("circle_" + newID +".png")
+
 
 }
 
@@ -150,7 +180,9 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
       xPosX : xPosX,
       yPosX : yPosX,
       xPosY : xPosY,
-      yPosY : yPosY
+      yPosY : yPosY,
+      idX : idX,
+      idY : idY
 
     }; 
 
@@ -198,42 +230,43 @@ function getSmallCirclePosition(sz,parentGenetics){
 //Need the Large Circle Radius
 lcr = (canvasSize - (swC * 2))/2; //Canvas size - (Child strokeweight x 2) / 2
 scr = (sz/2);
-
-xPosC = random(parentGenetics.xPosX,parentGenetics.xPosY);
-yPosC = random(parentGenetics.yPosX,parentGenetics.yPosY);
-
-
-a2 = Math.pow((xPosC - xPos),2);
-b2 = Math.pow((yPosC - yPos),2);
-ab = (Math.pow((xPosC - xPos),2)) + (Math.pow((yPosC - yPos),2));
-r2 = Math.pow((lcr-scr-(swC/2)),2);
+let xPosC = 0;
+let yPosC = 0;
 
 
-
-print("xPos: " + xPos);
-print("yPos: " + yPos);
-print("xPosC: " + xPosC);
-print("xPosC: " + yPosC);
-print("lcr: " + lcr);
-print("scr: " + scr);
-print("a2: " + a2);
-print("b2: " + b2);
-print("ab: " + ab);
-
-//need to figure out if the circle position ovelaps the other circle. If so, try again.
-if (ab > (r2))
-{
+let i = false;
+while (i === false){
   
-  print("No Soup for you!!");
+  xPosC = random(parentGenetics.xPosX,parentGenetics.xPosY);
+  yPosC = random(parentGenetics.yPosX,parentGenetics.yPosY);
 
-}
+  a2 = Math.pow((xPosC - xPos),2);
+  b2 = Math.pow((yPosC - yPos),2);
+  ab = (Math.pow((xPosC - xPos),2)) + (Math.pow((yPosC - yPos),2));
+  r2 = Math.pow((lcr-scr-(swC/2)),2);
 
-  return{
+  // print("xPos: " + xPos);
+  // print("yPos: " + yPos);
+  // print("xPosC: " + xPosC);
+  // print("xPosC: " + yPosC);
+  // print("lcr: " + lcr);
+  // print("scr: " + scr);
+  // print("a2: " + a2);
+  // print("b2: " + b2);
+  // print("ab: " + ab);
+
+  //need to figure out if the circle position ovelaps the other circle. If so, try again.
+  if (ab < r2) {i = true;}
+
+}//end the for loop
+  
+return{
 
     xPosC : xPosC,
     yPosC : yPosC
 
   }
+
 
 }
 
