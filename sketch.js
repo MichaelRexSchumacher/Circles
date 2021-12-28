@@ -1,12 +1,5 @@
 
 let table;
-let h = 0;
-let s = 0;
-let l = 0;
-let size = 0;
-let sw = 0;
-let xloc = 0;
-let yloc = 0;
 
 function preload() {
   //load the file with circle genetics
@@ -17,10 +10,12 @@ function preload() {
 
 function setup() {
 
-  cs = 400;
-  createCanvas(cs, cs + 100);
+  canvasSize = 400;
+  xPos = canvasSize / 2;
+  yPos = canvasSize / 2;
+  createCanvas(canvasSize, canvasSize + 100); //adding some space to the bottom of the canvas
   colorMode(HSL);
-  background(99, 50, 50);
+  background(0, 0, 0);
   noLoop();
 
 }
@@ -39,69 +34,38 @@ function draw() {
   //This will be a giant loop. Advance the generation each time.
   let gen = 0;
   let parentGenetics = getParentGenetics(gen);
-  
   let childGenetics = calculateChildGenetics(parentGenetics);
 
 
-   //apply the genetics to the child.
-  h = childGenetics.H_C;
-  s = parentGenetics.H_X;
-  l = parentGenetics.H_X;
+   //apply the genetics from the child.
+  h = childGenetics.hC;
+  s = childGenetics.sC;
+  l = childGenetics.lC;
+  sw = childGenetics.swC;
+  largeCircleSize =  canvasSize - (sw * 2);
+  smallCircleSize = childGenetics.sz;
+  posX = childGenetics.posX;
+  posY = childGenetics.posY;
 
-
-
-
+ 
   ///////////////////////
   //Large circle
-  strokeWeight(rsw);
-  print("RandomStrokeWeight: " + rsw);
-  stroke(StrokeHue, s, l);
-  //let LargeCircle = drawCircles(LargeCircleHue,s,l,200,200,sw);
+  largeCircleHue = h;
+  strokeHue = (h + 150) % 360;
+  stroke(strokeHue, s, l);
+  drawCircles(largeCircleHue, s, l, xPos, yPos, largeCircleSize, sw);
+  print("Large Circle Size: " + largeCircleSize);
+  print("Large Circle Hue: " + largeCircleHue);
+  print("Large Circle Sat: " + s);
+  print("Large Circle Lum: " + l);
+  print("Stroke Hue: " + strokeHue);
 
-  drawCircles(LargeCircleHue, s, l, cs / 2, cs / 2, LargeCircleSize, rsw);
-  print("Large Circle Size: " + LargeCircleSize);
-
-
-  //Small Circle. No stroke. //
-  SmallCircleSize = random(5, (LargeCircleSize - rsw - (cs / 2)));
-  //Small Circle should be LargeCirleSize (350) - Center Point(200) = 150??
-  print("Small Circle Size: " + SmallCircleSize);
-
-  //SmallCircleX = random(200 ,200); //Need to figure out postion from edge of large circle + strokeweight
-  //SmallCircelY = random(200 ,200);
-
-  SmallCircleX = random(((cs / 2) - SmallCircleSize), ((cs / 2) + SmallCircleSize));//Need to figure out postion from edge of large circle + strokeweight
-  print("SmallCircleX: " + SmallCircleX);
-  SmallCircleY = random(((cs / 2) - SmallCircleSize), ((cs / 2) + SmallCircleSize));
-  print("SmallCircleY: " + SmallCircleY);
-  drawCircles(SmallCircleHue, s, l, SmallCircleX, SmallCircleY, SmallCircleSize, 0);
-
-  ////////
-
-  fill(100, 50, 50);
-  let lchtxt = "Large Circle Hue: " + nf(LargeCircleHue, 3, 2).toString();
-  let schtxt = "Small Circle Hue: " + nf(SmallCircleHue, 2, 2).toString();
-  let swtext = "Stroke Weight Hue: " + nf(StrokeHue, 2, 2).toString();
-
-  print(lchtxt.length);
-  //Display Large Circle Hue Value
-  fill(LargeCircleHue, s, l);
-  text(lchtxt, ((cs / 2) - (lchtxt.length)), cs + 25);
-
-
-  //Display Stroke Hue Value
-  fill(StrokeHue, s, l);
-  text(swtext, (cs / 2) - (swtext.length), cs + 50);
-
-  //Display Small Circle Hue Value
-  fill(SmallCircleHue, s, l);
-  text(schtxt, (cs / 2) - (schtxt.length), cs + 75);
-
-  drawCircles();
- 
-
-
-
+  //small circle
+  smallCircleHue = (h + 210) % 360;
+  drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
+  print("Small Circle Size: " + smallCircleSize);
+  print("Small Circle Hue: " + smallCircleHue);
+  
 }
 
 function drawCircles(h, s, l, xloc, yloc, size, sw) {
@@ -118,16 +82,8 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
   function getParentGenetics(generation){
       //Find 2 random parents and get their genetics
       //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
-      
-      let CircleID_X = 0;
-      let CircleID_Y = 0;
-      let H_X = 0;
-      let H_Y = 0;
-      let S_X = 0;
-      let S_Y = 0;
-      let L_X = 0;
-      let L_Y = 0;
-      
+     
+
     //Get the rowcount of records in that generation
     let rows = table.matchRows(generation,"Generation");
     let rowcount = rows.length;
@@ -146,63 +102,129 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
     }//end while
 
 
-    CircleID_X = rows[p1].getString("CircleID");
-    CircleID_Y = rows[p2].getString("CircleID");
+    idX = rows[p1].getString("CircleID");
+    idY = rows[p2].getString("CircleID");
 
-    H_X = rows[p1].getString("H");
-    H_Y = rows[p2].getString("H");
+    hX = Number(rows[p1].getString("H"));
+    hY = Number(rows[p2].getString("H"));
 
-    S_X = rows[p1].getString("S");
-    S_Y = rows[p2].getString("S");
+    sX = Number(rows[p1].getString("S"));
+    sY = Number(rows[p2].getString("S"));
 
-    L_X = rows[p1].getString("L");
-    L_Y = rows[p2].getString("L");
+    lX = Number(rows[p1].getString("L"));
+    lY = Number(rows[p2].getString("L"));
+
+    swX = Number(rows[p1].getString("StrokeWeight"));
+    swY = Number(rows[p2].getString("StrokeWeight"));
+
+    szX = Number(rows[p1].getString("Size"));
+    szY = Number(rows[p2].getString("Size"));
+
+    xPosX = Number(rows[p1].getString("xPosition"));
+    xPosY = Number(rows[p2].getString("yPosition"));
+
+    yPosX = Number(rows[p1].getString("xPosition"));
+    yPosY = Number(rows[p2].getString("yPosition"));
 
     return {
        
-      H_X : H_X,
-      H_Y : H_Y,
-      S_X : S_X,
-      S_Y : S_Y,
-      L_X : L_X,
-      L_Y : L_Y
+      hX : hX,
+      hY : hY,
+      sX : sX,
+      sY : sY,
+      lX : lX,
+      lY : lY,
+      swX : swX,
+      swY : swY,
+      szX : szX,
+      szY : szY,
+      xPosX : xPosX,
+      yPosX : yPosX,
+      xPosY : xPosY,
+      yPosY : yPosY
 
     }; 
 
-
-
-}//GetParentGenetics
+}//end GetParentGenetics
   
 
 function calculateChildGenetics(parentGenetics){
 //Calculate the Child Genetics. This is the math shit...
 
+//Hue, Satuaration, Luminosity
+hC = random(parentGenetics.hX, parentGenetics.hY);
+sC = random(parentGenetics.sX, parentGenetics.sY);
+lC = random(parentGenetics.lX, parentGenetics.lY);
 
-//Hue
-H_C = random(parentGenetics.H_X, parentGenetics.H_Y);
 
 //Stroke weight of Large Circle
-rsw = random(5, 50);
-let LargeCircleSize = (cs - rsw); //Canvas size - strokeweight (400 - 50 = 350)
+swC = random(swX, swY);
 
+//Small circle size
+sz = random(parentGenetics.szX, parentGenetics.szY);
 
-
-
-
-let chue = (h + 90) % 360;
-let LargeCircleHue = h;
-let StrokeHue = (h + 150) % 360;
-let SmallCircleHue = (h + 210) % 360;
-
-
+smallCirclePositon = getSmallCirclePosition(sz, parentGenetics);
+xPosC = smallCirclePositon.xPosC;
+yPosC = smallCirclePositon.yPosC;
 
 
 return{
 
-  H_C: H_C,
+  hC : hC,
+  sC : sC,
+  lC : lC,
+  swC : swC,
+  xPosC : xPosC,
+  yPosC : yPosC,
+  sz : sz
 
+
+}
+}  //end calculateChildGenetics
+
+function getSmallCirclePosition(sz,parentGenetics){
+
+//Small circle position
+//Need the Large Circle Radius
+lcr = (canvasSize - swC)/2; //Canvas size - strokeweight (400 - 50 = 350)
+scr = (sz/2);
+
+print("lcr: " + lcr);
+print("scr: " + scr);
+
+xPosC = random(parentGenetics.xPosX,parentGenetics.xPosY);
+yPosC = random(parentGenetics.yPosX,parentGenetics.yPosY);
+
+print("xPos: " + xPos);
+print("yPos: " + yPos);
+print("xPosC: " + xPosC);
+print("xPosC: " + yPosC);
+
+a2 = (Math.pow((abs(xPosC - xPos)),2));
+b2 = (Math.pow((abs(yPosC - yPos)),2));
+ab = (Math.pow((abs(xPosC - xPos)),2)) + (Math.pow((abs(yPosC - yPos)),2));
+r2 = Math.pow((lcr-scr),2);
+
+print("a2: " + a2);
+print("b2: " + b2);
+print("ab: " + ab);
+print("r2: " + r2);
+
+//need to figure out if the circle position ovelaps the other circle. If so, try again.
+if (ab > r2)
+{
+  
+  print("No Soup for you!!");
+
+}
+
+  return{
+
+    xPosC : xPosC,
+    yPosC : yPosC
+
+  }
 
 }
 
 
-}
