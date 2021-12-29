@@ -6,7 +6,7 @@ Strating with two circles that have 4 variable features I generate X number chil
 Then for each subsequent generation I may assign a weighting factor to the randominzation based on precedding results.
 
 ## Variables
-#1 - Primary Hue and it's resulting split complimentary colors
+#1 - Primary Hue and it's resulting split complimentary colors.
 #2 - StrokeWeight
 #3 - Inner Circle Size
 #4 - Inner Circle Position
