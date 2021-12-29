@@ -16,7 +16,7 @@ function setup() {
   createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
-  maxGen = 1;
+  maxGen = 10;
   maxChildren = 4;
   noLoop();
 
@@ -39,8 +39,8 @@ function draw() {
      
       let idX = parentGenetics.idX;
       let idY = parentGenetics.idY;
-     print("idX: " + idX);
-     print("idY: " + idY);
+      print("idX: " + idX);
+      print("idY: " + idY);
       gen = gen + 1;
       for(let child = 0; child < maxChildren; child++){
 
@@ -63,18 +63,12 @@ function draw() {
       strokeHue = (h + 150) % 360;
       stroke(strokeHue, s, l);
       drawCircles(largeCircleHue, s, l, xPos, yPos, largeCircleSize, sw);
-      // print("Large Circle Size: " + largeCircleSize);
-      // print("Large Circle Hue: " + largeCircleHue);
-      // print("Large Circle Sat: " + s);
-      // print("Large Circle Lum: " + l);
-      // print("Large Circle StorkeWeight: " + sw)
-      // print("Stroke Hue: " + strokeHue);
 
       //small circle
       smallCircleHue = (h + 210) % 360;
       drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
       
-      //save the data
+      //save the data to the table
       let newID = max(table.getColumn("CircleID"))+1;
       let newRow = table.addRow();
       newRow.setString("CircleID", newID);
@@ -86,25 +80,22 @@ function draw() {
       newRow.setString("Size",smallCircleSize);
       newRow.setString("xPosition", xPosC);
       newRow.setString("yPosition",yPosC);
-      //newRow.setString("ParentXID", idX);
-      //newRow.setString("ParentYID", idY);
+      newRow.setString("ParentXID", idX);
+      newRow.setString("ParentYID", idY);
       
-      print("newID: " + newID);
 
+
+      print("newID: " + newID);
       //save the canavas
-      save("circle_" + newID +".png")
+      save("circle_" + newID + "_X" + idX + "_Y" + idY + ".png")
       clear();
       background(0, 0, 0); //reset the background to black
     }//End of the children
 
   }//end of the generation
 
-
-
 //Once all the new rows have been added..
 saveTable(table,"genetics.csv");
-
-
 
 }
 
@@ -135,9 +126,9 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
     let x = 0;
     while (p1 === p2){
     p2 = round(random(0,rowcount-1));
-    x = x + 1;
-    //safey exit
-    if (x === 10) {break;} else { }
+    // x = x + 1;
+    // //safey exit
+    // if (x === 10) {break;} else { }
     }//end while
 
 
