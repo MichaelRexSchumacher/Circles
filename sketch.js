@@ -16,7 +16,7 @@ function setup() {
   createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
-  maxGen = 10;
+  maxGen = 3;
   maxChildren = 4;
   noLoop();
 
@@ -33,17 +33,40 @@ function draw() {
 
   //Get the genetic values of the intial parents.
   //This will need to be a giant loop. Advance the generation each time.
-    for (let gen = 0; gen < maxGen;){
+    //Generation 0 only has 2 ; 
+    //generation 1 should have 4. (1X4) 2 families
+    //generation 2 should have 16 (4x4). 8 families
+    //generation 3 should have 64 (16x4). 32 families
 
-      let parentGenetics = getParentGenetics(gen);
-     
-      let idX = parentGenetics.idX;
-      let idY = parentGenetics.idY;
-      print("idX: " + idX);
-      print("idY: " + idY);
-      gen = gen + 1;
+for(let i = 0; i < 100; i++){
+
+  for (let gen = 0; gen < maxGen;){
+  print("Gen: " + gen) 
+  print("MaxGen: " + maxGen) 
+      
+    let maxFams;
+      if (gen > 0){
+        maxFams = (gen * maxChildren) / 2;
+        print("maxFams: " + maxFams);
+      } else{
+        maxFams = 1;
+      }
+    
+      
+      for (let fams  = 0; fams < maxFams;){
+        print("Fams: " + fams);
+        
+        let parentGenetics = getParentGenetics(gen);
+      
+        let idX = parentGenetics.idX;
+        let idY = parentGenetics.idY;
+        print("New ParentXID: " + idX);
+        print("New ParentXID: " + idY);
+      
+           
+
       for(let child = 0; child < maxChildren; child++){
-
+      print("Child: " + child);
       let childGenetics = calculateChildGenetics(parentGenetics);
 
       //apply the genetics from the child.
@@ -82,18 +105,21 @@ function draw() {
       newRow.setString("yPosition",yPosC);
       newRow.setString("ParentXID", idX);
       newRow.setString("ParentYID", idY);
-      
-
-
+     
       print("newID: " + newID);
       //save the canavas
-      save("circle_" + newID + "_X" + idX + "_Y" + idY + ".png")
+      //save("circle_" + newID + "_X" + idX + "_Y" + idY + ".png")
       clear();
       background(0, 0, 0); //reset the background to black
-    }//End of the children
+      }//End of the children
 
+      fams = fams + 1;
+    }//end of families
+
+    gen = gen + 1; //advance the generation
+  
   }//end of the generation
-
+}
 //Once all the new rows have been added..
 saveTable(table,"genetics.csv");
 
@@ -111,24 +137,54 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
 
   function getParentGenetics(generation){
     //Find 2 random parents and get their genetics
-    //Generation 0 should have 2 ; generation 1 should have 4; generation 2 should have 16, etc, etc
-     
+    
 
     //Get the rowcount of records in that generation
     let rows = table.matchRows(generation,"Generation");
     let rowcount = rows.length;
+    print("rowcount: " + rowcount);
     
-    //Get the row of parent 1 (X) 
+    //Get a random row from the rows
+    //Get the CircleID of that row (this is the Circle ID)
+    
     let p1 = round(random(0,rowcount-1));
+    let pID = rows[p1].get("CircleID");
+    
+    //Confirm the parent has not already been chosen. How?
+    let pIDExists = false;
+    //If p1 is in the table for the next generation, then retry.
+    //First time through, there will be no next generation records. Check rowcount.
+    
+    print("pID: " + pID);
+    let pXrows = table.matchRows(pID,"ParentXID");
+    let pYrows = table.matchRows(pID,"ParentYID")
+    
+    print("pXrows Count: " + pXrows.length);
+    print("pYrows Count: " + pYrows.length);
+
+    // if (newrows.rowcount > 0) {
+
+    //   pIDExists = true;
+    //   print("pIDExists:" + pIDExists)
+
+    // }
+
+    
+    
+    // for (let r = 0; r < newrows.length; r++) {
+       
+    //       if (pID =  newrows[r].get('CircleID')){
+    //         pIDcheck = true;
+    //       }
+          
+    // }
+   
 
     //Get the row of parent 2 (Y)... Can't be the same as Parent 1, so need to compare the random number generated
     let p2 = p1;
     let x = 0;
     while (p1 === p2){
     p2 = round(random(0,rowcount-1));
-    // x = x + 1;
-    // //safey exit
-    // if (x === 10) {break;} else { }
     }//end while
 
 
