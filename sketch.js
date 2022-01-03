@@ -6,8 +6,6 @@ function preload() {
 
 }
 
-
-
 function setup() {
 
   canvasSize = 400;
@@ -16,7 +14,7 @@ function setup() {
   createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
-  maxGen = 3;
+  maxGen = 5;
   maxChildren = 4;
   noLoop();
 
@@ -61,8 +59,6 @@ function draw() {
       print("New Parent! idx: " + idX);
       print("New Parent! idY: " + idY);
 
-
-
       for (let child = 0; child < maxChildren; child++) {
         print("Child: " + child);
         let childGenetics = calculateChildGenetics(parentGenetics);
@@ -87,7 +83,8 @@ function draw() {
 
         //small circle
         smallCircleHue = (h + 210) % 360;
-        drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0);
+        
+        drawCircles(smallCircleHue, s, l, xPosC, yPosC, smallCircleSize, 0)
 
         //save the data to the table
         let newID = max(table.getColumn("ID")) + 1;
@@ -105,8 +102,11 @@ function draw() {
         newRow.setString("ParentYID", idY);
 
         print("Child is born: " + newID);
+        newID = (newID).toString().padStart(4,'0');
         //save the canavas
-        //save("ID_" + newID + "_X" + idX + "_Y" + idY + ".png")
+         save("ID_" + newID + "_X" + (idX).toString().padStart(4,'0') + "_Y" + (idY).toString().padStart(4,'0') + ".png");
+       
+
         clear();
         background(0, 0, 0); //reset the background to black
 
@@ -137,47 +137,38 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
 function getParents(rows, parentArray) {
   let xRowID = 0;
   let yRowID = 0;
-  let parentXID;
-  let parentYID;
+  let parentXID = 0;
+  let parentYID = 0;
   let parentExists = 0;
 
-debugger;
-
-  print("rows: " + rows.length);
   //get parent x
- 
-    while (parentExists < 1){ 
+  do{
     xRowID = round(random(0, (rows.length) - 1));
-    print("xRowID: " + xRowID);
     parentXID = rows[xRowID].get("ID");
     if (parentArray.includes(parentXID)) {
-      parentExists = 1;
-    }
-    else{
-      parentExists = 0;
-    }
- 
+    parentExists = 1;
   }
+  else{
+    parentExists = 0;
+  }
+  }
+  while (parentExists > 0);
 
- 
-  
-  parentExists = 0;
-  //get parent y
-  while (parentExists < 1 ){
+  //Get the Y parent
+  do{
     yRowID = round(random(0, (rows.length) - 1));
-    print("yRowID: " + yRowID);
     parentYID = rows[yRowID].get("ID");
-    if (parentYID = parentXID || parentArray.includes(parentYID)){
+    if (parentYID == parentXID || parentArray.includes(parentYID)){
       parentExists = 1;
     }
     else{
-      parentExists = 0;
-    }
-
+    parentExists = 0;
   }
+  }
+  while (parentExists > 0); 
 
   return {
-      //Return the ROW ID of the parents (not the parent id)
+  //Return the ROW ID of the parents (not the parent id)
     xRowID: xRowID,
     yRowID: yRowID
 
