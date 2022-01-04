@@ -277,9 +277,7 @@ function getParents(rows, parentArray) {
 
   function getSmallCirclePosition(sz, parentGenetics) {
 
-    //Small circle position
     //Using Pythagores with LCR - SMR - Half the stroke weight. Stroke weight is centered on the edge.
-    //Need the Large Circle Radius
     lcr = (canvasSize - (swC * 2)) / 2; //Canvas size - (Child strokeweight x 2) / 2
     scr = (sz / 2);
     let xPosC = 0;
@@ -292,22 +290,12 @@ function getParents(rows, parentArray) {
       xPosC = random(parentGenetics.xPosX, parentGenetics.xPosY);
       yPosC = random(parentGenetics.yPosX, parentGenetics.yPosY);
 
-      a2 = Math.pow((xPosC - xPos), 2);
-      b2 = Math.pow((yPosC - yPos), 2);
+      // a2 = Math.pow((xPosC - xPos), 2);
+      // b2 = Math.pow((yPosC - yPos), 2);
       ab = (Math.pow((xPosC - xPos), 2)) + (Math.pow((yPosC - yPos), 2));
       r2 = Math.pow((lcr - scr - (swC / 2)), 2);
 
-      // print("xPos: " + xPos);
-      // print("yPos: " + yPos);
-      // print("xPosC: " + xPosC);
-      // print("xPosC: " + yPosC);
-      // print("lcr: " + lcr);
-      // print("scr: " + scr);
-      // print("a2: " + a2);
-      // print("b2: " + b2);
-      // print("ab: " + ab);
-
-      //need to figure out if the circle position ovelaps the other circle. If so, try again.
+      //if the circle position ovelaps the other circle. If so, try again.
       if (ab < r2) { i = true; }
 
     }//end the for loop
