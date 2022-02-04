@@ -18,6 +18,7 @@
   "homepage": "https://github.com/MichaelRexSchumacher/Circles#readme",
   "dependencies": {
     "express": "^4.17.2",
-    "multer": "^1.4.4"
+    "multer": "^1.4.4",
+    "nodemon": "^2.0.15"
   }
 }

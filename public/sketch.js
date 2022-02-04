@@ -1,4 +1,5 @@
 let table;
+let value1 = 500;
 
 function preload() {
   //load the file with circle genetics
@@ -11,7 +12,7 @@ function setup() {
   canvasSize = 400;
   xPos = canvasSize / 2;
   yPos = canvasSize / 2;
-  createCanvas(canvasSize, canvasSize); //adding some space to the bottom of the canvas
+  createCanvas(canvasSize, canvasSize, SVG); //adding some space to the bottom of the canvas
   colorMode(HSL);
   background(0, 0, 0);
   maxGen = 5;
@@ -21,7 +22,7 @@ function setup() {
 }
 
 
-function draw() {
+async function draw() {
 
   //Set up the colors and comlimentary
   //https://dev.to/benjaminadk/make-color-math-great-again--45of
@@ -103,13 +104,11 @@ function draw() {
 
         print("Child is born: " + newID);
         newID = (newID).toString().padStart(4,'0');
-        //save the canavas
-        //delay(10000);
-        //let sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        
+        await sleep(1000);
         saveCircle(newID ,idX, idY);
         clear();
         background(0, 0, 0);
+        
 
       } //End of the children
 
@@ -123,28 +122,37 @@ function draw() {
 
 
   //Once all the new rows have been added..
-  saveTable(table, "genetics.csv");
+  //saveTable(table, "genetics.csv");
 
 }
+
+const sleep = (millis) => { 
+  return new Promise(resolve => setTimeout(resolve, millis)) 
+}
+
 
 function saveCircle(newID ,idX, idY)
 {
   
- // save("ID_" + newID + "_X" + (idX).toString().padStart(4,'0') + "_Y" + (idY).toString().padStart(4,'0') + ".png");
-var imageName = "ID_" + newID + "_X" + (idX).toString().padStart(4,'0') + "_Y" + (idY).toString().padStart(4,'0') + ".png";
-var canvas = document.getElementById("defaultCanvas0").image;
-var image = canvas.toDataURL('image/png').replace(/data:image\/png;base64,/, ''); 
-
- const options = {
-               method: 'POST',
-               headers:{
-                   'Content-Type' : 'multipart/form-data'
-               }
-        };
-fetch('/api',options);
+save("ID_" + newID + "_X" + (idX).toString().padStart(4,'0') + "_Y" + (idY).toString().padStart(4,'0') + ".svg");
+//setInterval(2000);
+// var imageName = "ID_" + newID + "_X" + (idX).toString().padStart(4,'0') + "_Y" + (idY).toString().padStart(4,'0') + ".png";
+// var c = document.getElementById("defaultCanvas0").image;
 
 
-}
+
+// var image = canvas.toDataURL('image/png').replace(/data:image\/png;base64,/, ''); 
+
+//  const options = {
+//                method: 'POST',
+//                headers:{
+//                    'Content-Type' : 'multipart/form-data'
+//                }
+//         };
+// fetch('/api',options);
+
+
+ }
 
 
 
@@ -153,6 +161,7 @@ function drawCircles(h, s, l, xloc, yloc, size, sw) {
   fill(h, s, l); //fill the circle
   strokeWeight(sw);
   circle(xloc, yloc, size); //position and size the Circle
+
 
 }
 
@@ -330,9 +339,7 @@ function getParents(rows, parentArray) {
     }
   }
 
-  function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
-  }
+
 
 
 
